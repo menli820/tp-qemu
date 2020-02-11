@@ -158,6 +158,10 @@ def run(test, params, env):
             error_context.context("Extend disk to %s in guest"
                                   % block_size, logging.info)
             if os_type == 'windows':
+                if int(block_size) >= 2199023255552 and 'bios' in params['_short_name_map_file']['guest-hw.cfg']:
+                    test.cancel("cancel the block resize test for more than 2T disk.")
+                elif int(block_size) >= 17592186044416 and 'ovmf' in params['_short_name_map_file']['guest-hw.cfg']:
+                    test.cancel("cancel the block resize test for more than 16T disk.")
                 drive.extend_volume(session, mpoint)
             else:
                 utils_disk.resize_partition_linux(session, partition, str(block_size))
